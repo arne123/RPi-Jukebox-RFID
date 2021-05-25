@@ -12,19 +12,32 @@ logger = logging.getLogger('jb.rpc_server')
 class RpcServer:
 
     def __init__(self, objects):
+        logger.debug(f"ZMQ Version: {zmq.zmq_version()}")
         self.objects = objects
         self.context = None
         self._keep_running = True
 
     def connect(self, addrs=None):
         if addrs is None:
-            addrs = ["tcp://*:5555", "inproc://JukeBoxRpcServer", "ws://*:5556"]
+            addrs = ["tcp://*:5555", "inproc://JukeBoxRpcServer", "ws://127.0.0.1:5556"]
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REP)
         for addr in addrs:
             self.socket.bind(addr)
         self.socket.setsockopt(zmq.LINGER, 200)
+
+        self.connect_pub("ws://127.0.0.1:5557")
         return self.context
+
+    def connect_pub(self, addr):
+        # self.context_pub = zmq.Context()
+        self.socket_pub = self.context.socket(zmq.PUB)
+        self.socket_pub.bind(addr)
+        # self.socket.setsockopt(zmq.LINGER, 200)
+        return self.context
+
+    def publish_status(self, status):
+        self.socket_pub.send_string(json.dumps(status))
 
     def execute(self, obj, cmd, param):
         call_obj = self.objects.get(obj)
@@ -79,5 +92,6 @@ class RpcServer:
             logger.debug(client_response)
             #  Send reply back to client
             self.socket.send_string(json.dumps(client_response))
+            self.publish_status(client_response)
 
         return (1)

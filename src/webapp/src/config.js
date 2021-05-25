@@ -1,4 +1,4 @@
-const WEBSOCKET_ENDPOINT = 'ws://0.0.0.0:5556';
+const WEBSOCKET_ENDPOINT = 'ws://127.0.0.1:5556';
 
 export {
   WEBSOCKET_ENDPOINT,

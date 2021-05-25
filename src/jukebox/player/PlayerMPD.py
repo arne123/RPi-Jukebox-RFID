@@ -120,27 +120,19 @@ class player_control:
 
     def stop(self, param):
         self.mpd_retry_with_mutex(self.mpd_client.stop)
-        song = self.mpd_client.currentsong()
-
-        return ({'object': 'player', 'method': 'stop', 'params': song})
+        return ({})
 
     def pause(self, param):
         self.mpd_retry_with_mutex(self.mpd_client.pause, 1)
-        song = self.mpd_client.currentsong()
-        
-        return ({'object': 'player', 'method': 'pause', 'params': song})
+        return ({})
 
     def prev(self, param):
         self.mpd_retry_with_mutex(self.mpd_client.previous)
-        song = self.mpd_client.currentsong()
-        
-        return ({'object': 'player', 'method': 'prev', 'params': song})
+        return ({})
 
     def next(self, param):
         self.mpd_retry_with_mutex(self.mpd_client.next)
-        song = self.mpd_client.currentsong()
-        
-        return ({'object': 'player', 'method': 'next', 'params': song})
+        return ({})
 
     def seek(self, param):
         val = param.get('time')
@@ -363,10 +355,8 @@ class player_control:
         return ({'object': 'player', 'method': 'playlistaddplay', 'params': song})
 
     def playerstatus(self, param):
-        status = self.mpd_status
-        
-        return ({'object': 'player', 'method': 'playerstatus', 'params': status})
+        return (self.mpd_status)
 
     def playlistinfo(self, param):
         playlistinfo = (self.mpd_retry_with_mutex(self.mpd_client.playlistinfo))
-        return ({'object': 'player', 'method': 'playlistinfo', 'params': playlistinfo})
+        return (playlistinfo)
