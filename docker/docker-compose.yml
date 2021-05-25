@@ -1,0 +1,65 @@
+version: "3.9"
+
+services:
+  jukebox:
+    build:
+      context: ../
+      dockerfile: ./docker/jukebox.Dockerfile
+    container_name: jukebox
+    links:
+      - mpd
+    ports:
+      - 5555:5555
+      - 5556:5556
+    restart: unless-stopped
+    tty: true
+    volumes:
+      - ../src/jukebox:/home/pi/RPi-Jukebox-RFID/src/jukebox
+      - ../settings:/home/pi/RPi-Jukebox-RFID/settings
+      - ../shared:/home/pi/RPi-Jukebox-RFID/shared
+  
+  webapp:
+    build:
+      context: ../
+      dockerfile: ./docker/webapp.Dockerfile 
+    container_name: webapp
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    links:
+      - jukebox
+    ports:
+      - 3001:3000
+    restart: unless-stopped
+    volumes:
+      - ../src/webapp:/home/pi/RPi-Jukebox-RFID/webapp
+      - /home/pi/RPi-Jukebox-RFID/webapp/node_modules
+
+  # webui:
+  #   build:
+  #     context: ../
+  #     dockerfile: ./docker/webui.Dockerfile
+  #   container_name: webui
+  #   links:
+  #     - jukebox
+  #   ports:
+  #     - "8000:80"
+  #   restart: unless-stopped
+  #   tty: true
+  #   volumes:
+  #     - ../src/ui:/home/pi/RPi-Jukebox-RFID/src/ui
+  #     - ../settings:/home/pi/RPi-Jukebox-RFID/settings
+  #     - ../shared:/home/pi/RPi-Jukebox-RFID/shared
+
+  mpd:
+    build:
+      context: ../
+      dockerfile: ./docker/mpd.Dockerfile
+    container_name: mpd
+    ports:
+      - 6600:6600
+      - 8800:8800
+    restart: unless-stopped
+    volumes:
+      - ../shared/audiofolders:/root/.config/mpd/music:rw
+      - ../shared/playlists:/root/.config/mpd/playlists:rw
+      - ./config/docker.mpd.conf:/root/.config/mpd/mpd.conf:rw
