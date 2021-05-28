@@ -73,7 +73,7 @@ class player_control:
                         logger.error(f"{e}")
                         ret = {}
                         break
-            return ret
+        return ret
 
     def _mpd_status_poll(self):
         '''
